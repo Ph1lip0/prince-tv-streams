@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
 import { ChannelGrid } from '@/components/home/ChannelGrid';
-import { supabase, Channel } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
+import type { Channel } from '@/lib/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Watch = () => {

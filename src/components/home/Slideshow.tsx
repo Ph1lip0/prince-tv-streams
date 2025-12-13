@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase, Slideshow as SlideshowType } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
+import type { Slideshow as SlideshowType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';

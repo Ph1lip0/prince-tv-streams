@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase, Channel } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
+import type { Channel } from '@/lib/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 
