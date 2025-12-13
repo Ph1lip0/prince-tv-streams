@@ -1,11 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
 export type SubscriptionStatus = 'pending' | 'active' | 'expired';
+export type AppRole = 'admin' | 'user';
 
 export interface Profile {
   id: string;
@@ -15,7 +9,7 @@ export interface Profile {
   status: SubscriptionStatus;
   subscription_expires_at: string | null;
   created_at: string;
-  language: 'sw' | 'en';
+  language: string;
 }
 
 export interface Channel {
@@ -48,7 +42,7 @@ export interface Slideshow {
   title: string;
   description: string | null;
   image_url: string;
-  link_type: 'channel' | 'match' | 'external' | null;
+  link_type: string | null;
   link_id: string | null;
   order_index: number;
   is_active: boolean;
@@ -61,8 +55,14 @@ export interface PaymentRequest {
   amount: number;
   phone_number: string;
   transaction_id: string | null;
-  status: 'pending' | 'approved' | 'rejected';
+  status: string;
   created_at: string;
   approved_at: string | null;
   approved_by: string | null;
+}
+
+export interface UserRole {
+  id: string;
+  user_id: string;
+  role: AppRole;
 }

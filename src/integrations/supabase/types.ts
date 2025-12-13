@@ -14,16 +14,228 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      channels: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          order_index: number | null
+          stream_url: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          order_index?: number | null
+          stream_url: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          order_index?: number | null
+          stream_url?: string
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          channel_id: string | null
+          created_at: string | null
+          id: string
+          is_featured: boolean | null
+          is_live: boolean | null
+          match_time: string
+          poster_url: string | null
+          team_away: string
+          team_home: string
+          title: string
+        }
+        Insert: {
+          channel_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_live?: boolean | null
+          match_time: string
+          poster_url?: string | null
+          team_away: string
+          team_home: string
+          title: string
+        }
+        Update: {
+          channel_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_live?: boolean | null
+          match_time?: string
+          poster_url?: string | null
+          team_away?: string
+          team_home?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_requests: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string | null
+          id: string
+          phone_number: string
+          status: string | null
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          phone_number: string
+          status?: string | null
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          phone_number?: string
+          status?: string | null
+          transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          language: string | null
+          phone: string | null
+          status: Database["public"]["Enums"]["subscription_status"]
+          subscription_expires_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          language?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          subscription_expires_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          language?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          subscription_expires_at?: string | null
+        }
+        Relationships: []
+      }
+      slideshows: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          link_id: string | null
+          link_type: string | null
+          order_index: number | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          link_id?: string | null
+          link_type?: string | null
+          order_index?: number | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          link_id?: string | null
+          link_type?: string | null
+          order_index?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      subscription_status: "pending" | "active" | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +362,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      subscription_status: ["pending", "active", "expired"],
+    },
   },
 } as const

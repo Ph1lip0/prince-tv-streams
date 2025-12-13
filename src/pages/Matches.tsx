@@ -3,7 +3,8 @@ import { Clock, Play, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { supabase, Match } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
+import type { Match } from '@/lib/types';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { cn } from '@/lib/utils';
 

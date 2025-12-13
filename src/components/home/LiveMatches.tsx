@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Play, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase, Match } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
+import type { Match } from '@/lib/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
