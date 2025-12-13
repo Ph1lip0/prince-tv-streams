@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import Hls from 'hls.js';
 
 interface VideoPlayerProps {
   streamUrl: string;
@@ -113,6 +114,58 @@ export const VideoPlayer = ({ streamUrl, title }: VideoPlayerProps) => {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
+  // HLS stream handling
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !streamUrl) return;
+
+    let hls: Hls | null = null;
+
+    const isHlsStream = streamUrl.includes('.m3u8') || streamUrl.includes('.m3u');
+
+    if (isHlsStream) {
+      if (Hls.isSupported()) {
+        hls = new Hls({
+          enableWorker: true,
+          lowLatencyMode: true,
+        });
+        hls.loadSource(streamUrl);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          console.log('HLS manifest loaded');
+        });
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          console.error('HLS error:', data);
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                hls?.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                hls?.recoverMediaError();
+                break;
+              default:
+                hls?.destroy();
+                break;
+            }
+          }
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari native HLS support
+        video.src = streamUrl;
+      }
+    } else {
+      // Non-HLS streams (MP4, etc.)
+      video.src = streamUrl;
+    }
+
+    return () => {
+      if (hls) {
+        hls.destroy();
+      }
+    };
+  }, [streamUrl]);
+
   return (
     <div
       ref={containerRef}
@@ -124,7 +177,6 @@ export const VideoPlayer = ({ streamUrl, title }: VideoPlayerProps) => {
     >
       <video
         ref={videoRef}
-        src={streamUrl}
         className="w-full h-full object-contain bg-background"
         playsInline
         onEnded={() => setIsPlaying(false)}
