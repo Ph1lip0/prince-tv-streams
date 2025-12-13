@@ -1,18 +1,20 @@
-import { Tv } from 'lucide-react';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { useLanguage } from '@/contexts/LanguageContext';
+import princeTvLogo from '@/assets/prince-tv-logo.jpg';
 
 const Login = () => {
-  const { t, language, setLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-lg">P</span>
-          </div>
+          <img 
+            src={princeTvLogo} 
+            alt="PRINCE TV" 
+            className="w-10 h-10 rounded-xl object-cover"
+          />
           <span className="font-bold text-lg text-foreground">PRINCE TV</span>
         </div>
         <button
@@ -28,9 +30,11 @@ const Login = () => {
         <div className="w-full max-w-sm space-y-8">
           {/* Logo */}
           <div className="text-center">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl gradient-primary glow-primary flex items-center justify-center">
-              <Tv className="w-10 h-10 text-primary-foreground" />
-            </div>
+            <img 
+              src={princeTvLogo} 
+              alt="PRINCE TV" 
+              className="w-24 h-24 mx-auto mb-4 rounded-2xl object-cover shadow-lg"
+            />
             <h1 className="text-2xl font-bold text-foreground">PRINCE TV</h1>
             <p className="text-muted-foreground mt-2">
               {language === 'sw' 
