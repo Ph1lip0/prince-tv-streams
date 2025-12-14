@@ -208,24 +208,30 @@ export const VideoPlayer = ({ streamUrl, title }: VideoPlayerProps) => {
         ref={videoRef}
         className="w-full h-full object-contain bg-black"
         playsInline
-        crossOrigin="anonymous"
         onEnded={() => setIsPlaying(false)}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
       />
 
       {/* Loading Indicator */}
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black">
+      {isLoading && !hasError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
       {/* Error State */}
-      {hasError && !isLoading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black text-center p-4">
+      {hasError && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black text-center p-4 z-20">
           <p className="text-destructive mb-2">Unable to load stream</p>
-          <p className="text-muted-foreground text-sm">Please check the stream URL or try again later</p>
+          <p className="text-muted-foreground text-sm mb-4">Please check the stream URL or try again later</p>
+          <Button
+            onClick={() => window.location.reload()}
+            variant="outline"
+            size="sm"
+          >
+            Retry
+          </Button>
         </div>
       )}
 
@@ -278,7 +284,7 @@ export const VideoPlayer = ({ streamUrl, title }: VideoPlayerProps) => {
         </div>
 
         {/* Center Play Button */}
-        {!isPlaying && !trialEnded && (
+        {!isPlaying && !trialEnded && !hasError && !isLoading && (
           <button
             onClick={togglePlay}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full gradient-primary glow-primary flex items-center justify-center"
