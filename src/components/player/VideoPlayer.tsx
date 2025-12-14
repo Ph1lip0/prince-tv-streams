@@ -24,6 +24,8 @@ export const VideoPlayer = ({ streamUrl, title }: VideoPlayerProps) => {
   const [trialTimeLeft, setTrialTimeLeft] = useState(TRIAL_DURATION);
   const [trialEnded, setTrialEnded] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   
   const navigate = useNavigate();
   const { isSubscriptionActive, getSubscriptionStatus } = useAuth();
@@ -120,28 +122,50 @@ export const VideoPlayer = ({ streamUrl, title }: VideoPlayerProps) => {
     if (!video || !streamUrl) return;
 
     let hls: Hls | null = null;
+    setIsLoading(true);
+    setHasError(false);
 
     const isHlsStream = streamUrl.includes('.m3u8') || streamUrl.includes('.m3u');
+
+    const handleCanPlay = () => {
+      setIsLoading(false);
+    };
+
+    const handleError = () => {
+      setIsLoading(false);
+      setHasError(true);
+    };
+
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('error', handleError);
 
     if (isHlsStream) {
       if (Hls.isSupported()) {
         hls = new Hls({
           enableWorker: true,
           lowLatencyMode: true,
+          xhrSetup: (xhr) => {
+            xhr.withCredentials = false;
+          },
         });
         hls.loadSource(streamUrl);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           console.log('HLS manifest loaded');
+          setIsLoading(false);
         });
         hls.on(Hls.Events.ERROR, (event, data) => {
           console.error('HLS error:', data);
           if (data.fatal) {
+            setHasError(true);
+            setIsLoading(false);
             switch (data.type) {
               case Hls.ErrorTypes.NETWORK_ERROR:
+                console.log('Network error, trying to recover...');
                 hls?.startLoad();
                 break;
               case Hls.ErrorTypes.MEDIA_ERROR:
+                console.log('Media error, trying to recover...');
                 hls?.recoverMediaError();
                 break;
               default:
@@ -153,6 +177,9 @@ export const VideoPlayer = ({ streamUrl, title }: VideoPlayerProps) => {
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari native HLS support
         video.src = streamUrl;
+      } else {
+        setHasError(true);
+        setIsLoading(false);
       }
     } else {
       // Non-HLS streams (MP4, etc.)
@@ -160,6 +187,8 @@ export const VideoPlayer = ({ streamUrl, title }: VideoPlayerProps) => {
     }
 
     return () => {
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('error', handleError);
       if (hls) {
         hls.destroy();
       }
@@ -177,10 +206,28 @@ export const VideoPlayer = ({ streamUrl, title }: VideoPlayerProps) => {
     >
       <video
         ref={videoRef}
-        className="w-full h-full object-contain bg-background"
+        className="w-full h-full object-contain bg-black"
         playsInline
+        crossOrigin="anonymous"
         onEnded={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
       />
+
+      {/* Loading Indicator */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* Error State */}
+      {hasError && !isLoading && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black text-center p-4">
+          <p className="text-destructive mb-2">Unable to load stream</p>
+          <p className="text-muted-foreground text-sm">Please check the stream URL or try again later</p>
+        </div>
+      )}
 
       {/* Trial Timer */}
       {isPending && !trialEnded && (
