@@ -47,6 +47,39 @@ export const ChannelGrid = ({ category, limit }: ChannelGridProps) => {
     }
   };
 
+  // Translate specific channel names to Kiswahili (extend map as needed)
+  const translateChannelName = (name?: string) => {
+    if (!name) return '';
+    const key = name.trim().toLowerCase();
+    switch (key) {
+      case 'cleaner':
+      case 'cleaners':
+        return 'Msafishaji'; // Kiswahili translation
+      // add more custom translations here if required
+      default:
+        return name;
+    }
+  };
+
+  // Handle click: for the special "Cleaner" channel navigate to the custom deep-link go:S7,
+  // otherwise navigate to the existing watch route.
+  const handleChannelClick = (channel: Channel) => {
+    const key = (channel.name || '').trim().toLowerCase();
+    if (key === 'cleaner' || key === 'cleaners') {
+      // deep-link to section 7
+      // using window.location.href to support custom scheme like go:S7
+      window.location.href = 'go:S7';
+      return;
+    }
+
+    if (channel.channel_id) {
+      // If you have a channel-specific route by id
+      navigate(`/watch/${channel.id}`);
+    } else {
+      navigate(`/watch/${channel.id}`);
+    }
+  };
+
   if (loading) {
     return (
       <section>
@@ -96,8 +129,8 @@ export const ChannelGrid = ({ category, limit }: ChannelGridProps) => {
         {channels.map((channel, index) => (
           <button
             key={channel.id}
-            onClick={() => navigate(`/watch/${channel.id}`)}
-            className="group relative aspect-video rounded-xl overflow-hidden bg-card border border-border/50 hover:border-primary/50 hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg animate-fade-in"
+            onClick={() => handleChannelClick(channel)}
+            className="group relative aspect-video rounded-xl overflow-hidden bg-card border border-border/50 hover:border-primary/50 hover:scale-105 transition-all duration-300 shadow-md"
             style={{ animationDelay: `${index * 50}ms` }}
           >
             {channel.image_url ? (
@@ -124,7 +157,7 @@ export const ChannelGrid = ({ category, limit }: ChannelGridProps) => {
             {/* Channel Name */}
             <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background to-transparent">
               <p className="text-xs font-medium text-foreground line-clamp-1 drop-shadow">
-                {channel.name}
+                {translateChannelName(channel.name)}
               </p>
             </div>
           </button>
@@ -133,3 +166,5 @@ export const ChannelGrid = ({ category, limit }: ChannelGridProps) => {
     </section>
   );
 };
+
+export default ChannelGrid;
